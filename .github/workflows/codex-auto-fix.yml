@@ -3,7 +3,7 @@ name: Codex Auto-Fix on CI Failure
 on:
   workflow_run:
     # Update this list to match your primary CI workflow names
-    workflows: ["CI"]
+    workflows: ["CI/CD Pipeline"]
     types: [completed]
 
 permissions:
