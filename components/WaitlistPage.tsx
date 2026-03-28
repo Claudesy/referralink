@@ -13,7 +13,7 @@ import { ArrowLeft, Plus, Minus, Zap, Building2, FileText, User, Loader2, X, Pri
 const WhatsAppIcon = ({ size = 16, style }: { size?: number; style?: React.CSSProperties }) => (
   <MessageCircle size={size} style={style} />
 );
-import * as XLSX from 'xlsx';
+import readXlsxFile from 'read-excel-file/browser';
 import { searchICD10Code, clearDiagnosisCache } from '../services/diagnosisApiClient';
 // import { searchICD10CodeStreaming } from '../services/geminiService'; // Deprecated
 import { ICD10Result } from '../types';
@@ -458,26 +458,18 @@ export const WaitlistPage: React.FC<WaitlistPageProps> = ({ onBack }) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const bstr = evt.target?.result;
-      const wb = XLSX.read(bstr, { type: 'binary' });
-      const wsname = wb.SheetNames[0];
-      const ws = wb.Sheets[wsname];
-      const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
-      
+    readXlsxFile(file).then((rows) => {
       // Assume data is in format: [["Penyakit", "Jumlah"], ["Flu", 50], ...]
-      // Transform to chart format
-      const transformedData = (data as any[]).slice(1).map((row: any) => ({
-        label: row[0] as string,
-        value: parseInt(row[1] as string) || 0
+      // Transform to chart format (skip header row)
+      const transformedData = rows.slice(1).map((row) => ({
+        label: String(row[0] ?? ''),
+        value: parseInt(String(row[1] ?? '0')) || 0
       })).filter(item => item.label && item.value > 0).slice(0, 7); // Take top 7
 
       if (transformedData.length > 0) {
         setChartData(transformedData);
       }
-    };
-    reader.readAsBinaryString(file);
+    });
   };
 
   const now = new Date();
