@@ -43,7 +43,7 @@
   "overrides": {
     "ajv": "8.18.0",
     "minimatch": "10.2.4",
-    "undici": "6.24.1",
+    "undici": "8.0.2",
     "path-to-regexp": "6.3.0",
     "smol-toml": "1.6.1"
   },
